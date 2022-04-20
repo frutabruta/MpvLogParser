@@ -234,33 +234,38 @@ QString Soubor::formatHex(QString vstup)
 }
 
 
-QDomElement Soubor::souborNaRadky(QString fileName)
+QVector<ZaznamMpvLogu> Soubor::souborNaRadky(QString fileName)
 {
     // zdroj: https://stackoverflow.com/questions/5444959/read-a-text-file-line-by-line-in-qt
     QFile inputFile(fileName);
     QDomElement vystup;
     int counter=0;
+    QVector<ZaznamMpvLogu> zaznamy;
+
     if (inputFile.open(QIODevice::ReadOnly))
     {
         QTextStream in(&inputFile);
         while (!in.atEnd())
         {
             QString line = in.readLine();
-            zpracujRadek(line);
+            zaznamy.append(zpracujRadek(line));
             // qDebug()<<counter<<" "<<line;
             counter++;
         }
         inputFile.close();
     }
-    return vystup;
+
+    qDebug()<<"konec soubornaRadky";
+    return zaznamy;
 }
 
 
-void Soubor::zpracujRadek(QString radek)
+QVector<ZaznamMpvLogu> Soubor::zpracujRadek(QString radek)
 {
     qDebug()<<"Soubor::zpracujRadek";
     int zacatek =radek.indexOf("<");
     QString orezanyRadek;
+    QVector<ZaznamMpvLogu> zaznamy;
     if (zacatek<0)
     {
         qDebug()<<"zadna zprava na tomto radku";
@@ -279,12 +284,14 @@ void Soubor::zpracujRadek(QString radek)
     for( int i=0;i<elementy.count();i++)
     {
         ZaznamMpvLogu vysledek=qDomElementToZaznamMpvLogu(elementy.at(i).toElement());
-        zapisCsv( vysledek.vypisCsv());
+       // zapisCsvKomplet( vysledek.vypisCsv());
+        zaznamy.append(vysledek);
 
     }
 
 
     qDebug()<<"pocet tagu: "<<elementy.count();
+    return zaznamy;
 }
 
 ZaznamMpvLogu Soubor::qDomElementToZaznamMpvLogu(QDomElement vstup)
@@ -314,7 +321,7 @@ ZaznamMpvLogu Soubor::qDomElementToZaznamMpvLogu(QDomElement vstup)
 
 
 
-void Soubor::zapisCsv(QString vstup)
+void Soubor::zapisCsvKomplet(QString vstup)
 {
     QFile file(cestaSouboruHtml);
     //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -341,5 +348,128 @@ void Soubor::zapisCsv(QString vstup)
 
 }
 
+void Soubor::zapisCsvSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup)
+{
+    qDebug()<<"Soubor::zapisCsvSeznamZaznamu";
+    QFile file(cestaSouboruHtml);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+   // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+
+        qDebug()<<"pocetZaznamu "<<vstup.count();
+
+        for(int i=0;i<vstup.count();i++)
+        {
+
+
+
+               stream <<vstup[i].vypisCsv();
+
+        }
+
+        //stream << "ahoj";
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+
+void Soubor::otevriCsv()
+{
+    file.setFileName(cestaSouboruHtml);
+    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        // We're going to streaming text to the file
+        qDebug()<<"soubor "<<cestaSouboruHtml<<" je otevreny";
+
+        QTextStream stream(&file);
+
+       // stream << vstup;
+        //stream << "ahoj";
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+/*
+void Soubor::zapisRadekCsv(QString vstup)
+{
+    QFile file(cestaSouboruHtml);
+    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+
+        stream << vstup;
+        //stream << "ahoj";
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+*/
+
+/*
+void Soubor::zavriCsv(QString vstup)
+{
+    QFile file(cestaSouboruHtml);
+    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+
+        stream << vstup;
+        //stream << "ahoj";
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+*/
 
 

@@ -26,10 +26,14 @@ public:
 
     QString cestaSouboruHex="vstup.hex";
     QString cestaSouboruHtml="vystup.html";
-    QDomElement souborNaRadky(QString fileName);
-    void zpracujRadek(QString radek);
+    QVector<ZaznamMpvLogu> souborNaRadky(QString fileName);
+    QVector<ZaznamMpvLogu> zpracujRadek(QString radek);
     ZaznamMpvLogu qDomElementToZaznamMpvLogu(QDomElement vstup);
-    void zapisCsv(QString vstup);
+    void zapisCsvKomplet(QString vstup);
+
+    QFile file;
+    void otevriCsv();
+    void zapisCsvSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup);
 signals:
      void odesliChybovouHlasku(QString chybovaHlaska);
 

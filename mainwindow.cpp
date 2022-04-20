@@ -27,7 +27,9 @@ void MainWindow::on_pushButton_process_clicked()
     soubor.cestaSouboruHex=ui->lineEdit_cestaSouboru->text();
     soubor.cestaSouboruHtml=ui->lineEdit_cestaHTML->text();
    // soubor.otevriSoubor();
-    soubor.souborNaRadky(soubor.cestaSouboruHex);
+   QVector<ZaznamMpvLogu> vysledek= soubor.souborNaRadky(soubor.cestaSouboruHex);
+    soubor.zapisCsvSeznamZaznamu(vysledek);
+
 
 }
 
