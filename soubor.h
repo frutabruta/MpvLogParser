@@ -34,9 +34,11 @@ public:
     QFile file;
     void otevriCsv();
     void zapisCsvSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup);
+    int spocitejRadkySouboru(QString fileName);
 signals:
-     void odesliChybovouHlasku(QString chybovaHlaska);
-
+    void odesliChybovouHlasku(QString chybovaHlaska);
+    void nastavProgressCteni(int vstup);
+    void nastavProgressZapis(int vstup);
 
 };
 

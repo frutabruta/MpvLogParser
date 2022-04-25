@@ -13,7 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEdit_cestaSouboru->setText(soubor.cestaSouboruHex);
     ui->lineEdit_cestaHTML->setText(soubor.cestaSouboruHtml);
     connect(&soubor,&Soubor::odesliChybovouHlasku,this,&MainWindow::pridejChybuDoOkna);
-
+    connect(&soubor,&Soubor::nastavProgressCteni,this,&MainWindow::slotNastavProgressCteni);
+    connect(&soubor,&Soubor::nastavProgressZapis,this,&MainWindow::slotNastavProgressZapis);
+    resetujProgressBar();
 }
 
 MainWindow::~MainWindow()
@@ -22,11 +24,36 @@ MainWindow::~MainWindow()
 }
 
 
+void MainWindow::resetujProgressBar()
+{
+    ui->progressBar2->setMinimum(0);
+    ui->progressBar2->setMaximum(100);
+    ui->progressBar2->setValue(0);
+
+    ui->progressBar3->setMinimum(0);
+    ui->progressBar3->setMaximum(100);
+    ui->progressBar3->setValue(0);
+}
+
+
+void MainWindow::slotNastavProgressCteni(int hodnota)
+{
+    ui->progressBar2->setValue(hodnota);
+}
+
+void MainWindow::slotNastavProgressZapis(int hodnota)
+{
+    ui->progressBar3->setValue(hodnota);
+}
+
 void MainWindow::on_pushButton_process_clicked()
 {
     soubor.cestaSouboruHex=ui->lineEdit_cestaSouboru->text();
     soubor.cestaSouboruHtml=ui->lineEdit_cestaHTML->text();
    // soubor.otevriSoubor();
+    resetujProgressBar();
+    ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruHex));
+    ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruHex));
    QVector<ZaznamMpvLogu> vysledek= soubor.souborNaRadky(soubor.cestaSouboruHex);
     soubor.zapisCsvSeznamZaznamu(vysledek);
 

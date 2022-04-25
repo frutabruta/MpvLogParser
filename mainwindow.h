@@ -19,8 +19,11 @@ public:
     QString saveToFile();
 
     QString loadFromFile();
+    void resetujProgressBar();
 public slots:
     void pridejChybuDoOkna(QString vstup);
+    void slotNastavProgressCteni(int hodnota);
+    void slotNastavProgressZapis(int hodnota);
 private slots:
     void on_pushButton_process_clicked();
 

@@ -14,31 +14,70 @@ ZaznamMpvLogu::ZaznamMpvLogu()
 
 QString ZaznamMpvLogu::vypis()
 {
+    qDebug()<<"ZaznamMpvLogu::vypis";
     QString vystup;
-    vystup+="zaznam "+this->imei+" "+this->rz+" "+this->pkt+" "+this->lat+" "+ this->lng+" "+ this->tm+" "+ this->events+" "+this->rych;
+    //this->Obsah["imei"];
+    //vystup+=this->Obsah[""];
+
+    vystup+="zaznam ";
+
+
+    vystup+=this->Obsah.value("imei");
+    vystup+" ";
+    vystup+=this->Obsah.value("rz");
+    vystup+" ";
+    vystup+=this->Obsah.value("pkt");
+    vystup+" ";
+    vystup+=this->Obsah.value("lat");
+    vystup+" ";
+    vystup+=this->Obsah.value("lng");
+    vystup+" ";
+    vystup+=this->Obsah.value("tm");
+    vystup+" ";
+    vystup+=this->Obsah.value("events");
+    vystup+" ";
+    vystup+=this->Obsah.value("rych");
+
 
     return vystup;
 }
 
-QString ZaznamMpvLogu::vypisCsv()
+QString ZaznamMpvLogu::vypisCsvRadek(QVector<QString> hlavicka)
 {
+  //  qDebug()<<"ZaznamMpvLogu::vypisCsv()";
     QString vystup;
     QString separator=";";
-    vystup+=escape(this->imei);
-    vystup+=separator;
-    vystup+=escape(this->rz);
-    vystup+=separator;
-    vystup+=escape(this->pkt);
-    vystup+=separator;
-    vystup+=escape(this->lat);
-    vystup+=separator;
-    vystup+=escape(this->lng);
-    vystup+=separator;
-    vystup+=escape(this->tm);
-    vystup+=separator;
-    vystup+=escape(this->events);
-    vystup+=separator;
-    vystup+=escape(this->rych);
+    //vystup+=escape(this->Obsah.value(""]);
+
+
+    foreach( QString polozka,hlavicka)
+    {
+        vystup+=escape(this->Obsah.value(polozka));
+        //qDebug()<<"polozka "<<polozka;
+        vystup+=separator;
+    }
+
+
+    vystup+="\n";
+
+    return vystup;
+}
+
+QString ZaznamMpvLogu::vypisCsvHlavicka(QVector<QString> hlavicka)
+{
+    qDebug()<<"ZaznamMpvLogu::vypisCsv()";
+    QString vystup;
+    QString separator=";";
+    //vystup+=escape(this->Obsah.value(""]);
+
+
+    foreach( QString polozka,hlavicka)
+    {
+        vystup+=escape(polozka);
+       // qDebug()<<"polozka "<<polozka;
+        vystup+=separator;
+    }
+
 
     vystup+="\n";
 
@@ -53,3 +92,5 @@ QString ZaznamMpvLogu::escape(QString vstup)
 
     return vystup;
 }
+
+
