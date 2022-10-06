@@ -570,7 +570,7 @@ bool Soubor::zapisCsvZacatek(QVector<QString> &hlavicka, QFile &file)
         hlavicka.push_back("tm");
         hlavicka.push_back("events");
 
-        /*
+
         hlavicka.push_back("imei");
         hlavicka.push_back("type");
         hlavicka.push_back("conn");
@@ -581,7 +581,7 @@ bool Soubor::zapisCsvZacatek(QVector<QString> &hlavicka, QFile &file)
         hlavicka.push_back("ppevent");
         hlavicka.push_back("ppstatus");
         hlavicka.push_back("pperror");
-    */
+
 
 
 
