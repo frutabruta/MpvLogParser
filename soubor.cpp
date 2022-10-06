@@ -51,7 +51,7 @@ void Soubor::otevriSoubor()
 
     qDebug()<<vysledek;
 
-    this->vypis(vysledek);
+   // this->vypis(vysledek);
 
     // najdiCestaHlaseni(doc);
 
