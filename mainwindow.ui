@@ -77,7 +77,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Výstupní csv</string>
+          <string>Výstupní CSV</string>
          </property>
         </widget>
        </item>
@@ -101,18 +101,28 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QLabel" name="label_3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
-          <string>Výstupní sqlite</string>
+          <string>Výstupní sqlite (zatím neimplementováno)</string>
          </property>
         </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLineEdit" name="lineEdit_3"/>
+          <widget class="QLineEdit" name="lineEdit_3">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_3">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Otevři</string>
            </property>
