@@ -47,15 +47,24 @@ QString ZaznamMpvLogu::vypisCsvRadek(QVector<QString> hlavicka)
   //  qDebug()<<"ZaznamMpvLogu::vypisCsv()";
     QString vystup;
     QString separator=";";
-    //vystup+=escape(this->Obsah.value(""]);
 
 
+/*
     foreach( QString polozka,hlavicka)
     {
         vystup+=escape(this->Obsah.value(polozka));
-        //qDebug()<<"polozka "<<polozka;
+        vystup+=separator;
+    }*/
+
+
+    for(int i=0;i<hlavicka.count()-1;i++)
+    {
+        vystup+=escape(this->Obsah.value(hlavicka.at(i)));
+       // qDebug()<<"polozka "<<polozka;
+
         vystup+=separator;
     }
+    vystup+=escape(this->Obsah.value(hlavicka.last()));
 
 
     vystup+="\n";
@@ -70,13 +79,20 @@ QString ZaznamMpvLogu::vypisCsvHlavicka(QVector<QString> hlavicka)
     QString separator=";";
     //vystup+=escape(this->Obsah.value(""]);
 
-
-    foreach( QString polozka,hlavicka)
+    if(hlavicka.isEmpty())
     {
-        vystup+=escape(polozka);
+        return "";
+    }
+
+    for(int i=0;i<hlavicka.count()-1;i++)
+    {
+        vystup+=escape(hlavicka.at(i));
        // qDebug()<<"polozka "<<polozka;
+
         vystup+=separator;
     }
+    vystup+=hlavicka.last();
+
 
 
     vystup+="\n";

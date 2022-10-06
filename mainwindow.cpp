@@ -1,8 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtDebug>
-#include <QFile>
-#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -15,6 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&soubor,&Soubor::odesliChybovouHlasku,this,&MainWindow::pridejChybuDoOkna);
     connect(&soubor,&Soubor::nastavProgressCteni,this,&MainWindow::slotNastavProgressCteni);
     connect(&soubor,&Soubor::nastavProgressZapis,this,&MainWindow::slotNastavProgressZapis);
+
+    connect(this,&MainWindow::signalSpustitImport,&soubor,&Soubor::slotSouborNaRadky2);
+
+
+
     resetujProgressBar();
 }
 
@@ -48,14 +50,18 @@ void MainWindow::slotNastavProgressZapis(int hodnota)
 
 void MainWindow::on_pushButton_process_clicked()
 {
+    pridejChybuDoOkna("Zacatek importu:"+QTime::currentTime().toString() );
+
     soubor.cestaSouboruHex=ui->lineEdit_cestaSouboru->text();
     soubor.cestaSouboruHtml=ui->lineEdit_cestaHTML->text();
    // soubor.otevriSoubor();
     resetujProgressBar();
     ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruHex));
     ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruHex));
-   QVector<ZaznamMpvLogu> vysledek= soubor.souborNaRadky(soubor.cestaSouboruHex);
-    soubor.zapisCsvSeznamZaznamu(vysledek);
+
+
+    emit signalSpustitImport(soubor.cestaSouboruHex);
+    pridejChybuDoOkna("Konec importu:"+QTime::currentTime().toString() );
 
 
 }

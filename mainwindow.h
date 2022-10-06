@@ -2,6 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtDebug>
+#include <QFile>
+#include <QFileDialog>
+
 #include "soubor.h"
 
 QT_BEGIN_NAMESPACE
@@ -36,5 +40,8 @@ private:
     Soubor soubor;
 
     QByteArray obsahSouboru;
+
+signals:
+    void signalSpustitImport(QString parametr);
 };
 #endif // MAINWINDOW_H
