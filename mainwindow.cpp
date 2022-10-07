@@ -7,13 +7,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->lineEdit_cestaSouboru->setText(soubor.cestaSouboruHex);
-    ui->lineEdit_cestaHTML->setText(soubor.cestaSouboruHtml);
+    ui->lineEdit_cestaLog->setText(soubor.cestaSouboruLog);
+    ui->lineEdit_cestaCsv->setText(soubor.cestaSouboruCsv);
     connect(&soubor,&Soubor::odesliChybovouHlasku,this,&MainWindow::pridejChybuDoOkna);
     connect(&soubor,&Soubor::nastavProgressCteni,this,&MainWindow::slotNastavProgressCteni);
     connect(&soubor,&Soubor::nastavProgressZapis,this,&MainWindow::slotNastavProgressZapis);
 
     connect(this,&MainWindow::signalSpustitImport,&soubor,&Soubor::slotSouborNaRadky2);
+
+
+    QString compilationTime = QString("%1T%2").arg(__DATE__,__TIME__);
+    ui->label_verze->setText(compilationTime);
 
 
 
@@ -52,15 +56,17 @@ void MainWindow::on_pushButton_process_clicked()
 {
     pridejChybuDoOkna("Zacatek importu:"+QTime::currentTime().toString() );
 
-    soubor.cestaSouboruHex=ui->lineEdit_cestaSouboru->text();
-    soubor.cestaSouboruHtml=ui->lineEdit_cestaHTML->text();
+    soubor.cestaSouboruLog=ui->lineEdit_cestaLog->text();
+    soubor.cestaSouboruCsv=ui->lineEdit_cestaCsv->text();
+
+    soubor.sloupecky=ui->lineEdit_formatHlavicky->text();
    // soubor.otevriSoubor();
     resetujProgressBar();
-    ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruHex));
-    ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruHex));
+    ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
+    ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
 
 
-    emit signalSpustitImport(soubor.cestaSouboruHex);
+    emit signalSpustitImport(soubor.cestaSouboruLog);
     pridejChybuDoOkna("Konec importu:"+QTime::currentTime().toString() );
 
 
@@ -86,17 +92,18 @@ QString MainWindow::loadFromFile()
 
 
 
-void MainWindow::on_pushButtonInputFile_clicked()
+void MainWindow::on_pushButton_inputFile_clicked()
 {
-    soubor.cestaSouboruHex=this->loadFromFile();
-    ui->lineEdit_cestaSouboru->setText(soubor.cestaSouboruHex);
+    soubor.cestaSouboruLog=this->loadFromFile();
+    ui->lineEdit_cestaCsv->setText(soubor.zmenPriponu(soubor.cestaSouboruLog,"csv"));
+    ui->lineEdit_cestaLog->setText( soubor.cestaSouboruLog);
 }
 
 
 void MainWindow::on_pushButton_outputFile_clicked()
 {
-    soubor.cestaSouboruHtml=this->saveToFile();
-    ui->lineEdit_cestaHTML->setText(soubor.cestaSouboruHtml);
+    soubor.cestaSouboruCsv=this->saveToFile();
+    ui->lineEdit_cestaCsv->setText(soubor.cestaSouboruCsv);
 }
 
 void MainWindow::pridejChybuDoOkna(QString vstup)
@@ -105,4 +112,22 @@ void MainWindow::pridejChybuDoOkna(QString vstup)
 }
 
 
+void MainWindow::on_pushButton_najdiHlavicky_clicked()
+{
+    pridejChybuDoOkna("Zacatek hledani hlavicek:"+QTime::currentTime().toString() );
+
+    soubor.cestaSouboruLog=ui->lineEdit_cestaLog->text();
+    soubor.cestaSouboruCsv=ui->lineEdit_cestaCsv->text();
+   // soubor.otevriSoubor();
+    resetujProgressBar();
+    ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
+    ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
+
+
+   // emit signalSpustitImport(soubor.cestaSouboruHex);
+    pridejChybuDoOkna("Konec hledani hlavicek:"+QTime::currentTime().toString() );
+    ui->lineEdit_formatHlavicky->setText(soubor.slotLogVyrobSeznamSloupecku(soubor.cestaSouboruLog));
+
+
+}
 

@@ -17,40 +17,66 @@
 class Soubor : public QObject
 {
     Q_OBJECT
+
 public:
+
+    //konstruktor a destruktor
     explicit Soubor(QObject *parent = nullptr);
 
+
+    //instance knihoven
+
+    //promenne
+
+    QString cestaSouboruLog="";
+    QString cestaSouboruCsv="";
+    QString sloupecky="";
+    QFile file;
+
+    //funkce
     void otevriSoubor();
 
-    void vypis(QByteArray vstup);
-    QString zavorky(char vstup);
-    QString hexDoplnNulu(char vstup);
-    QString tabulkaBunka(QString vstup);
-    QString tabulkaRadek(QString vstup);
-    QString wrapper(QString vstup);
-    void zapisHtml(QString vstup);
-    QString htmlHlavicka();
-    QString htmlStyl();
-    QString formatHex(QString vstup);
-
-    QString cestaSouboruHex="vstup.hex";
-    QString cestaSouboruHtml="vystup.html";
-    QVector<ZaznamMpvLogu> souborNaRadky(QString fileName);
-    QVector<ZaznamMpvLogu> zpracujRadek(QString radek, int cisloRadku);
-    ZaznamMpvLogu qDomElementToZaznamMpvLogu(QDomElement vstup);
-    void zapisCsvKomplet(QString vstup);
-
-    QFile file;
-    void otevriCsv();
-    void zapisCsvSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup);
     int spocitejRadkySouboru(QString fileName);
 
-    void zapisCsvKonec(QFile &file);
-    bool zapisCsvZacatek(QVector<QString> &hlavicka, QFile &file);
-    void zapisCsvJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file);
+    //nezarazeno
+
+    QString zmenPriponu(QString vstup, QString pripona);
+private:
+
+    //instance knihoven
+    //promenne
+    //funkce
+    void csvOtevri();
+    void csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file);
+    void csvZapisKomplet(QString vstup);
+    void csvZapisKonec(QFile &file);
+    void csvZapisSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup);
+    bool csvZapisZacatek(QVector<QString> &hlavicka, QFile &file);
+
+    QString formatHex(QString vstup);
+    QString hexDoplnNulu(char vstup);
+
+    QString htmlHlavicka();
+    QString htmlStyl();
+    QString htmlTabulkaBunka(QString vstup); //nepouzito
+    QString htmlTabulkaRadek(QString vstup); //nepouzit
+    void htmlVypis(QByteArray vstup);
+    QString htmlWrapper(QString vstup);
+    void htmlZapis(QString vstup);
+    QString htmlZavorky(char vstup);
+
+    QVector<ZaznamMpvLogu> logSouborNaRadky(QString fileName);
+    QVector<ZaznamMpvLogu> logZpracujRadek(QString radek, int cisloRadku);
+    QVector<QString> logZpracujRadekHledejHlavicky(QString radek, int cisloRadku, QVector<QString> seznamSloupecku);
+
+    //nezarazeno
+
+    ZaznamMpvLogu qDomElementToZaznamMpvLogu(QDomElement vstup);
+    QString vektorStringuOddelovac(QVector<QString> vstup, QString oddelovac);
 
 public slots:
     int slotSouborNaRadky2(QString fileName);
+    QString slotLogVyrobSeznamSloupecku(QString fileName);
 signals:
     void odesliChybovouHlasku(QString chybovaHlaska);
     void nastavProgressCteni(int vstup);

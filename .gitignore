@@ -1,6 +1,7 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
-
+/release
+/debug
 *~
 *.autosave
 *.a
@@ -71,3 +72,7 @@ Thumbs.db
 *.dll
 *.exe
 
+# Program input
+*.log
+# Program output
+*.csv

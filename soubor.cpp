@@ -5,42 +5,207 @@
 
 Soubor::Soubor(QObject *parent) : QObject(parent)
 {
-    QString nazevSouboru="testhexdump.hex";
-    cestaSouboruHex=QCoreApplication::applicationDirPath()+"/"+nazevSouboru;
+    QString nazevSouboru="soubor.log";
+    cestaSouboruLog=QCoreApplication::applicationDirPath()+"/"+nazevSouboru;
+    sloupecky="turnus;line;evc;np;lat;lng;akt;takt;konc;tjr;pkt;tm;events;imei;type;conn;rych;smer;ridi;delta;ppevent;ppstatus;pperror";
+    cestaSouboruCsv=zmenPriponu(cestaSouboruLog,"csv");
 }
 
 
 
+void Soubor::csvZapisKomplet(QString vstup)
+{
+    qDebug()<<Q_FUNC_INFO;
+    QFile file(cestaSouboruCsv);
+    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+
+        stream << vstup;
+        //stream << "ahoj";
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+
+void Soubor::csvZapisSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup)
+{
+    qDebug()<<Q_FUNC_INFO;
+    QFile file(cestaSouboruCsv);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+        // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+
+        qDebug()<<"pocetZaznamu "<<vstup.count();
+
+
+        QVector<QString> hlavicka;
+        QStringList seznam=sloupecky.split(";");
+
+        foreach(QString retezec,seznam)
+        {
+          hlavicka.push_back(retezec);
+        }
+
+
+        stream <<ZaznamMpvLogu::vypisCsvHlavicka(hlavicka);
+
+        int pocetZaznamu=vstup.count();
+        for(int i=0;i<pocetZaznamu;i++)
+        {
+            stream <<vstup[i].vypisCsvRadek(hlavicka);
+            emit this->nastavProgressZapis(i);
+        }
+
+        //stream << "ahoj";
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+
+
+bool Soubor::csvZapisZacatek(QVector<QString> &hlavicka, QFile &file)
+{
+    qDebug()<<"Soubor::zapisCsvSeznamZaznamu";
+   // QFile file(cestaSouboruHtml);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+
+        QStringList seznam=sloupecky.split(";");
+
+        foreach(QString retezec,seznam)
+        {
+          hlavicka.push_back(retezec);
+        }
+
+        stream <<ZaznamMpvLogu::vypisCsvHlavicka(hlavicka);
+
+        return 1;
+
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+
+    }
+    return 0;
+}
+
+void Soubor::csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file)
+{
+         QTextStream stream(&file);
+
+         int pocetZaznamu=vstup.count();
+         for(int i=0;i<pocetZaznamu;i++)
+         {
+             stream <<vstup[i].vypisCsvRadek(hlavicka);
+             emit this->nastavProgressZapis(i);
+         }
+}
+
+void Soubor::csvZapisKonec(QFile &file)
+{
+    qDebug()<<Q_FUNC_INFO;
+    file.close();
+    QString zapsano="Writing finished";
+    qDebug() << zapsano;
+    emit odesliChybovouHlasku(zapsano);
+}
+
+void Soubor::csvOtevri()
+{
+    file.setFileName(cestaSouboruCsv);
+    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        qDebug()<<"soubor "<<cestaSouboruCsv<<" je otevreny";
+        QTextStream stream(&file);
+        file.close();
+        QString zapsano="Writing finished";
+        qDebug() << zapsano;
+        emit odesliChybovouHlasku(zapsano);
+    }
+    else
+    {
+        QString chybovaHlaska="soubor nelze zapsat";
+        qDebug()<<chybovaHlaska;
+        emit odesliChybovouHlasku(chybovaHlaska);
+    }
+
+
+}
+
+
+QString Soubor::formatHex(QString vstup)
+{
+    qDebug()<<"";
+
+
+    QString vystup=vstup;
+    if (vstup=="1b")
+    {
+        vystup="<span class=\"format\">"+vstup+"</span>";
+    }
+    if (vstup=="0a")
+    {
+        vystup="<span class=\"lf\">"+vstup+"</span>";
+    }
+    if (vstup=="0e")
+    {
+        vystup="<span class=\"escape\">"+vstup+"</span>";
+    }
+
+    return vystup;
+}
+
+
 void Soubor::otevriSoubor()
 {
-    qDebug()<<"Soubor::otevriSoubor()";
+    qDebug()<<Q_FUNC_INFO;
     QDomDocument doc("mydocument");
-    // QFile file("xml_zdroje/XML_Zlicin_20200702_20200705.xml");
 
-    // QFile file(cesta+"/konfigurace/konfigurace.xml");
-    //QString cesta;
-
-    qDebug()<<"cesta k souboru je "<<cestaSouboruHex;
-    QFile file(cestaSouboruHex);
+    qDebug()<<"cesta k souboru je "<<cestaSouboruLog;
+    QFile file(cestaSouboruLog);
 
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        //  emit odesliChybovouHlasku("soubor se nepovedlo otevrit");
         QString neotevruSoubor="soubor se nepovedlo otevrit";
         qDebug()<<neotevruSoubor;
         emit odesliChybovouHlasku(neotevruSoubor);
         return;
     }
-    /*
-    if (!doc.setContent(&file))
-    {
-      //   emit odesliChybovouHlasku("soubor se nepovedlo otevrit2");
-        qDebug()<<"nepovedlo se nastavit obsah dom dokumentu";
-        file.close();
-        return;
-    }
-    */
+
     QByteArray vysledek;
     vysledek=file.readAll();
     file.close();
@@ -51,17 +216,12 @@ void Soubor::otevriSoubor()
 
     qDebug()<<vysledek;
 
-   // this->vypis(vysledek);
-
-    // najdiCestaHlaseni(doc);
-
 }
 
 
-void Soubor::vypis(QByteArray vstup)
+void Soubor::htmlVypis(QByteArray vstup)
 {
-    qDebug()<<"Soubor::vypis";
-    //qDebug()<<"delka velikost je "<<vstup.size()<<" delka je "<<vstup.length();
+    qDebug()<<Q_FUNC_INFO;
     int delka=vstup.length();
     QVector<QString> radky;
     QVector<QString> radkyHex;
@@ -70,13 +230,13 @@ void Soubor::vypis(QByteArray vstup)
     for (int i=0; i<(delka);i++)
     {
 
-        radek+=zavorky(vstup.at(i));
+        radek+=htmlZavorky(vstup.at(i));
         radekHex+=" ";
         radekHex+=this->formatHex(this->hexDoplnNulu(vstup.at(i)));
         if (vstup.at(i) ==0x0D)
         {
             i++;
-            radek+=zavorky(vstup.at(i));
+            radek+=htmlZavorky(vstup.at(i));
             radekHex+=" ";
             radekHex+=this->formatHex(this->hexDoplnNulu(vstup.at(i)));
 
@@ -84,40 +244,26 @@ void Soubor::vypis(QByteArray vstup)
             radkyHex.append(radekHex);
             radek="";
             radekHex="";
-            // qDebug()<<"konec prikazu";
 
         }
-
-        // qDebug()<<i<<" "<<vstup[i];
     }
     qDebug()<<"konec";
-
-
-
-
-
 
     QString htmlSoubor="";
     QString htmlRadky="";
     for (int g=0;g<radkyHex.length();g++)
     {
-        htmlRadky+=tabulkaRadek(tabulkaBunka(radky.at(g))+tabulkaBunka(radkyHex.at(g)));
-        //    qDebug()<<radky.at(g)<<" "<<radkyHex.at(g);
+        htmlRadky+=htmlTabulkaRadek(htmlTabulkaBunka(radky.at(g))+htmlTabulkaBunka(radkyHex.at(g)));
     }
-    /*
-    foreach(QString hodnota,radky)
-    {
-        qDebug()<<hodnota;
-    }
-*/
-    htmlSoubor=this->wrapper(htmlRadky);
-    zapisHtml(htmlSoubor);
+
+    htmlSoubor=this->htmlWrapper(htmlRadky);
+    htmlZapis(htmlSoubor);
     qDebug()<<htmlSoubor;
 
 }
 
 
-QString Soubor::zavorky(char vstup)
+QString Soubor::htmlZavorky(char vstup)
 {
     qDebug()<<"";
 
@@ -149,7 +295,7 @@ QString Soubor::hexDoplnNulu(char vstup)
 
 }
 
-QString Soubor::tabulkaBunka(QString vstup)
+QString Soubor::htmlTabulkaBunka(QString vstup)
 {
     qDebug()<<"";
 
@@ -157,7 +303,7 @@ QString Soubor::tabulkaBunka(QString vstup)
     return vystup;
 }
 
-QString Soubor::tabulkaRadek(QString vstup)
+QString Soubor::htmlTabulkaRadek(QString vstup)
 {
     qDebug()<<"";
 
@@ -165,7 +311,7 @@ QString Soubor::tabulkaRadek(QString vstup)
     return vystup;
 }
 
-QString Soubor::wrapper(QString vstup)
+QString Soubor::htmlWrapper(QString vstup)
 {
     qDebug()<<"";
 
@@ -173,12 +319,12 @@ QString Soubor::wrapper(QString vstup)
     return vystup;
 }
 
-void Soubor::zapisHtml(QString vstup)
+void Soubor::htmlZapis(QString vstup)
 {
     qDebug()<<"";
 
 
-    QFile file(cestaSouboruHtml);
+    QFile file(cestaSouboruCsv);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         // We're going to streaming text to the file
@@ -196,13 +342,11 @@ void Soubor::zapisHtml(QString vstup)
         qDebug()<<chybovaHlaska;
         emit odesliChybovouHlasku(chybovaHlaska);
     }
-
-
 }
 
 QString Soubor::htmlHlavicka()
 {
-    qDebug()<<"";
+    qDebug()<<Q_FUNC_INFO;
 
     QString vystup="<head>"+this->htmlStyl()+"</head>";
     // QString vystup2="<head><link rel=\"stylesheet\" href=\"mystyle.css\"></head>";
@@ -211,7 +355,7 @@ QString Soubor::htmlHlavicka()
 
 QString Soubor::htmlStyl()
 {
-    qDebug()<<"";
+    qDebug()<<Q_FUNC_INFO;
 
     QString styl="*{font-family: \"Courier New\", Courier, \"Lucida Sans Typewriter\", \"Lucida Typewriter\", monospace;color: black;}";
     styl+="td{border: 1px solid blue;}";
@@ -223,32 +367,12 @@ QString Soubor::htmlStyl()
     return vystup;
 }
 
-QString Soubor::formatHex(QString vstup)
+
+
+
+QVector<ZaznamMpvLogu> Soubor::logSouborNaRadky(QString fileName)
 {
-    qDebug()<<"";
-
-
-    QString vystup=vstup;
-    if (vstup=="1b")
-    {
-        vystup="<span class=\"format\">"+vstup+"</span>";
-    }
-    if (vstup=="0a")
-    {
-        vystup="<span class=\"lf\">"+vstup+"</span>";
-    }
-    if (vstup=="0e")
-    {
-        vystup="<span class=\"escape\">"+vstup+"</span>";
-    }
-
-    return vystup;
-}
-
-
-QVector<ZaznamMpvLogu> Soubor::souborNaRadky(QString fileName)
-{
-    qDebug()<<"Soubor::souborNaRadky";
+    qDebug()<<Q_FUNC_INFO;
 
     // zdroj: https://stackoverflow.com/questions/5444959/read-a-text-file-line-by-line-in-qt
     QFile inputFile(fileName);
@@ -256,19 +380,15 @@ QVector<ZaznamMpvLogu> Soubor::souborNaRadky(QString fileName)
     int counter=0;
     QVector<ZaznamMpvLogu> zaznamy;
 
-
-
     if (inputFile.open(QIODevice::ReadOnly))
     {
-
-
 
         //   qDebug()<<"soubor ma "<<counter<<" radku";
         QTextStream in(&inputFile);
         while (!in.atEnd())
         {
             QString line = in.readLine();
-            zaznamy.append(zpracujRadek(line,counter));
+            zaznamy.append(logZpracujRadek(line,counter));
 
             // qDebug()<<counter<<" "<<line;
             counter++;
@@ -283,55 +403,8 @@ QVector<ZaznamMpvLogu> Soubor::souborNaRadky(QString fileName)
     return zaznamy;
 }
 
-int Soubor::slotSouborNaRadky2(QString fileName)
-{
-    qDebug()<<"Soubor::souborNaRadky";
 
-    // zdroj: https://stackoverflow.com/questions/5444959/read-a-text-file-line-by-line-in-qt
-    QFile inputFile(fileName);
-    // QDomElement vystup;
-    int counter=0;
-
-
-    QFile csvcko(cestaSouboruHtml);
-
-    QVector<QString> hlavicka;
-    zapisCsvZacatek(hlavicka,csvcko);
-
-
-
-    if (inputFile.open(QIODevice::ReadOnly))
-    {
-
-        //   qDebug()<<"soubor ma "<<counter<<" radku";
-        QTextStream in(&inputFile);
-        while (!in.atEnd())
-        {
-            QString line = in.readLine();
-            QVector<ZaznamMpvLogu> zaznamy=zpracujRadek(line,counter);
-
-
-
-            // qDebug()<<counter<<" "<<line;
-            counter++;
-            zapisCsvJedenRadek(zaznamy,hlavicka,csvcko);
-            emit this->nastavProgressCteni(counter);
-            qApp->processEvents();
-
-        }
-
-        inputFile.close();
-    }
-
-
-    zapisCsvKonec(csvcko);
-
-    qDebug()<<"konec soubornaRadky";
-    return counter;
-}
-
-
-QVector<ZaznamMpvLogu> Soubor::zpracujRadek(QString radek, int cisloRadku)
+QVector<ZaznamMpvLogu> Soubor::logZpracujRadek(QString radek, int cisloRadku)
 {
     // qDebug()<<"Soubor::zpracujRadek";
     int zacatek =radek.indexOf("<");
@@ -356,7 +429,7 @@ QVector<ZaznamMpvLogu> Soubor::zpracujRadek(QString radek, int cisloRadku)
     int pocetElementu=elementy.count();
     if (pocetElementu==0)
     {
-        qDebug()<<"elementy nejsou";
+        qDebug()<<"elementy nejsou na radku:"<<QString::number(cisloRadku);
         return zaznamy2;
     }
     else
@@ -365,42 +438,168 @@ QVector<ZaznamMpvLogu> Soubor::zpracujRadek(QString radek, int cisloRadku)
     }
     for( int i=0;i<pocetElementu;i++)
     {
-        //    qDebug()<<"element cislo "<<i;
         ZaznamMpvLogu vysledek=qDomElementToZaznamMpvLogu(elementy.at(i).toElement());
-        // zapisCsvKomplet( vysledek.vypisCsv());
-
-        //    qDebug()<<"jdu appendovat element cislo "<<i<<" ktery ma ";//<<vysledek.Obsah.count()<<" elementu do struktury s poctem "<<zaznamy2.count();
         zaznamy2.push_back(vysledek);
-
     }
-
-
-    //   qDebug()<<"pocet tagu: "<<pocetElementu;
     return zaznamy2;
 }
 
+
+QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloRadku, QVector<QString> seznamSloupecku )
+{
+
+
+    int zacatek =radek.indexOf("<");
+    QString orezanyRadek;
+    QVector<ZaznamMpvLogu> zaznamy2;
+    if (zacatek<0)
+    {
+        qDebug()<<"zadna zprava na radku "<<QString::number(cisloRadku);
+        return seznamSloupecku;
+    }
+    else
+    {
+        orezanyRadek=radek.mid(zacatek);
+    }
+    QDomDocument soubor;
+    soubor.setContent(orezanyRadek);
+    QDomElement koren;
+    koren=soubor.firstChildElement();
+    QDomNodeList elementy=koren.elementsByTagName("V");
+
+    int pocetElementu=elementy.count();
+    if (pocetElementu==0)
+    {
+
+        qDebug()<<"elementy nejsou na radku:"<<QString::number(cisloRadku);
+        return seznamSloupecku;
+    }
+    else
+    {
+        //      qDebug()<<"elementu je "<<pocetElementu;
+    }
+    for( int i=0;i<pocetElementu;i++)
+    {
+        QDomNamedNodeMap atributy= elementy.at(i).toElement().attributes();
+
+        for(int j=0;j<atributy.length();j++)
+        {
+            QString nazevAtributu= atributy.item(i).nodeName();
+            if(!seznamSloupecku.contains(nazevAtributu))
+            {
+                if(nazevAtributu!="")
+                {
+               seznamSloupecku.push_back(nazevAtributu);
+
+                }
+            }
+
+        }
+
+
+    }
+
+    return seznamSloupecku;
+}
+
+int Soubor::slotSouborNaRadky2(QString fileName)
+{
+    qDebug()<<Q_FUNC_INFO;
+
+    // zdroj: https://stackoverflow.com/questions/5444959/read-a-text-file-line-by-line-in-qt
+    QFile inputFile(fileName);
+    // QDomElement vystup;
+    int counter=0;
+
+
+    QFile csvcko(cestaSouboruCsv);
+
+    QVector<QString> hlavicka;
+    csvZapisZacatek(hlavicka,csvcko);
+
+
+
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+
+        //   qDebug()<<"soubor ma "<<counter<<" radku";
+        QTextStream in(&inputFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
+
+
+
+            // qDebug()<<counter<<" "<<line;
+            counter++;
+            csvZapisJedenRadek(zaznamy,hlavicka,csvcko);
+            emit this->nastavProgressCteni(counter);
+            qApp->processEvents();
+
+        }
+
+        inputFile.close();
+    }
+
+
+    csvZapisKonec(csvcko);
+
+    qDebug()<<"konec soubornaRadky";
+    return counter;
+}
+
+QString Soubor::slotLogVyrobSeznamSloupecku(QString fileName)
+{
+    qDebug()<<Q_FUNC_INFO;
+    QVector<QString> seznamSloupecku;
+     QString vyslednaRadaSloupecku="";
+
+    // zdroj: https://stackoverflow.com/questions/5444959/read-a-text-file-line-by-line-in-qt
+    QFile inputFile(fileName);
+    // QDomElement vystup;
+    int counter=0;
+
+    QVector<QString> hlavicka;
+
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+
+        //   qDebug()<<"soubor ma "<<counter<<" radku";
+        QTextStream in(&inputFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            seznamSloupecku=logZpracujRadekHledejHlavicky(line,counter, seznamSloupecku);
+
+            // qDebug()<<counter<<" "<<line;
+            counter++;
+
+            emit this->nastavProgressCteni(counter);
+            qApp->processEvents();
+
+        }
+
+        vyslednaRadaSloupecku=vektorStringuOddelovac(seznamSloupecku,";");
+        qDebug()<<"hlavicky: "<<vyslednaRadaSloupecku;
+        inputFile.close();
+    }
+
+    qDebug()<<"konec soubornaRadky";
+    return vyslednaRadaSloupecku;
+}
+
+
+
+
 ZaznamMpvLogu Soubor::qDomElementToZaznamMpvLogu(QDomElement vstup)
 {
-    // qDebug()<<"Soubor::qDomElementToZaznamMpvLogu";
 
     ZaznamMpvLogu zaznam;
-    /*
-    zaznam.imei= vstup.attributes().namedItem("imei").nodeValue();
-    zaznam.rz= vstup.attributes().namedItem("rz").nodeValue();
-    zaznam.pkt= vstup.attributes().namedItem("pkt").nodeValue();
-    zaznam.lat= vstup.attributes().namedItem("lat").nodeValue();
-    zaznam.lng= vstup.attributes().namedItem("lng").nodeValue();
-    zaznam.tm= vstup.attributes().namedItem("tm").nodeValue();
-    zaznam.events= vstup.attributes().namedItem("events").nodeValue();
-    zaznam.rych= vstup.attributes().namedItem("rych").nodeValue();
-*/
 
-    //QMap<QString,QString> vystup;
     int pocetAtributu=0;
     pocetAtributu=vstup.attributes().count();
 
-
-    //  qDebug()<<"pocet atributu je "<<pocetAtributu;
     if (pocetAtributu<=0)
     {
 
@@ -415,324 +614,17 @@ ZaznamMpvLogu Soubor::qDomElementToZaznamMpvLogu(QDomElement vstup)
         // qDebug()<<" vypis atributu "<<atribut<<" "<<hodnota;
         zaznam.Obsah.insert(atribut,hodnota);
     }
-
-
-    /*
-    zaznam.= vstup.attributes().namedItem("").nodeValue();
-    zaznam.= vstup.attributes().namedItem("").nodeValue();
-    zaznam.= vstup.attributes().namedItem("").nodeValue();
-
-    */
     // qDebug()<<"konec Soubor::qDomElementToZaznamMpvLogu";
     return zaznam;
 }
 
 
 
-void Soubor::zapisCsvKomplet(QString vstup)
-{
-    qDebug()<<"Soubor::zapisCsvKomplet";
-    QFile file(cestaSouboruHtml);
-    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
-    {
-        // We're going to streaming text to the file
-        QTextStream stream(&file);
-
-        stream << vstup;
-        //stream << "ahoj";
-        file.close();
-        QString zapsano="Writing finished";
-        qDebug() << zapsano;
-        emit odesliChybovouHlasku(zapsano);
-    }
-    else
-    {
-        QString chybovaHlaska="soubor nelze zapsat";
-        qDebug()<<chybovaHlaska;
-        emit odesliChybovouHlasku(chybovaHlaska);
-    }
-
-
-}
-
-void Soubor::zapisCsvSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup)
-{
-    qDebug()<<"Soubor::zapisCsvSeznamZaznamu";
-    QFile file(cestaSouboruHtml);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-
-        // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
-    {
-        // We're going to streaming text to the file
-        QTextStream stream(&file);
-
-        qDebug()<<"pocetZaznamu "<<vstup.count();
-
-
-        QVector<QString> hlavicka;
-        hlavicka.push_back("imei");
-        hlavicka.push_back("pkt");
-        hlavicka.push_back("lat");
-        hlavicka.push_back("lng");
-        hlavicka.push_back("tm");
-        hlavicka.push_back("events");
-        hlavicka.push_back("type");
-        hlavicka.push_back("line");
-        hlavicka.push_back("conn");
-        hlavicka.push_back("rych");
-        hlavicka.push_back("smer");
-        hlavicka.push_back("evc");
-        hlavicka.push_back("np");
-        hlavicka.push_back("turnus");
-        hlavicka.push_back("ridic");
-        hlavicka.push_back("akt");
-        hlavicka.push_back("konc");
-        hlavicka.push_back("delta");
-        hlavicka.push_back("ppevent");
-        hlavicka.push_back("ppstatus");
-        hlavicka.push_back("pperror");
-
-
-        stream <<ZaznamMpvLogu::vypisCsvHlavicka(hlavicka);
-
-        int pocetZaznamu=vstup.count();
-        for(int i=0;i<pocetZaznamu;i++)
-        {
-
-
-
-            stream <<vstup[i].vypisCsvRadek(hlavicka);
-            emit this->nastavProgressZapis(i);
-        }
-
-        //stream << "ahoj";
-        file.close();
-        QString zapsano="Writing finished";
-        qDebug() << zapsano;
-        emit odesliChybovouHlasku(zapsano);
-    }
-    else
-    {
-        QString chybovaHlaska="soubor nelze zapsat";
-        qDebug()<<chybovaHlaska;
-        emit odesliChybovouHlasku(chybovaHlaska);
-    }
-
-
-}
-
-
-bool Soubor::zapisCsvZacatek(QVector<QString> &hlavicka, QFile &file)
-{
-    qDebug()<<"Soubor::zapisCsvSeznamZaznamu";
-   // QFile file(cestaSouboruHtml);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-
-        QTextStream stream(&file);
-
-      /*
-        hlavicka.push_back("imei");
-        hlavicka.push_back("pkt");
-        hlavicka.push_back("lat");
-        hlavicka.push_back("lng");
-        hlavicka.push_back("tm");
-        hlavicka.push_back("events");
-        hlavicka.push_back("type");
-        hlavicka.push_back("line");
-        hlavicka.push_back("conn");
-        hlavicka.push_back("rych");
-        hlavicka.push_back("smer");
-        hlavicka.push_back("evc");
-        hlavicka.push_back("np");
-        hlavicka.push_back("turnus");
-        hlavicka.push_back("ridic");
-        hlavicka.push_back("akt");
-        hlavicka.push_back("konc");
-        hlavicka.push_back("delta");
-        hlavicka.push_back("ppevent");
-        hlavicka.push_back("ppstatus");
-        hlavicka.push_back("pperror");
-        */
-        hlavicka.push_back("turnus");
-        hlavicka.push_back("line");
-        hlavicka.push_back("evc");
-        hlavicka.push_back("np");
-        hlavicka.push_back("lat");
-        hlavicka.push_back("lng");
-        hlavicka.push_back("akt");
-        hlavicka.push_back("takt");
-        hlavicka.push_back("konc");
-        hlavicka.push_back("tjr");
-        hlavicka.push_back("pkt");
-        hlavicka.push_back("tm");
-        hlavicka.push_back("events");
-
-
-        hlavicka.push_back("imei");
-        hlavicka.push_back("type");
-        hlavicka.push_back("conn");
-        hlavicka.push_back("rych");
-        hlavicka.push_back("smer");
-        hlavicka.push_back("ridic");
-        hlavicka.push_back("delta");
-        hlavicka.push_back("ppevent");
-        hlavicka.push_back("ppstatus");
-        hlavicka.push_back("pperror");
-
-
-
-
-        stream <<ZaznamMpvLogu::vypisCsvHlavicka(hlavicka);
-
-        return 1;
-
-    }
-    else
-    {
-        QString chybovaHlaska="soubor nelze zapsat";
-        qDebug()<<chybovaHlaska;
-        emit odesliChybovouHlasku(chybovaHlaska);
-
-    }
-    return 0;
-
-
-}
-
-void Soubor::zapisCsvJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file)
-{
-  //  qDebug()<<Q_FUNC_INFO;
-
-         QTextStream stream(&file);
-
-    //    qDebug()<<"pocetZaznamu "<<vstup.count();
-
-
-
-
-    //    int pocetZaznamu=vstup.count();
-
-
-         int pocetZaznamu=vstup.count();
-         for(int i=0;i<pocetZaznamu;i++)
-         {
-
-
-
-             stream <<vstup[i].vypisCsvRadek(hlavicka);
-             emit this->nastavProgressZapis(i);
-         }
-
-
-       //     emit this->nastavProgressZapis(i);
-
-
-
-}
-
-void Soubor::zapisCsvKonec(QFile &file)
-{
-    qDebug()<<Q_FUNC_INFO;
-    file.close();
-    QString zapsano="Writing finished";
-    qDebug() << zapsano;
-    emit odesliChybovouHlasku(zapsano);
-}
-
-void Soubor::otevriCsv()
-{
-    file.setFileName(cestaSouboruHtml);
-    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
-    {
-        // We're going to streaming text to the file
-        qDebug()<<"soubor "<<cestaSouboruHtml<<" je otevreny";
-
-        QTextStream stream(&file);
-
-        // stream << vstup;
-        //stream << "ahoj";
-        file.close();
-        QString zapsano="Writing finished";
-        qDebug() << zapsano;
-        emit odesliChybovouHlasku(zapsano);
-    }
-    else
-    {
-        QString chybovaHlaska="soubor nelze zapsat";
-        qDebug()<<chybovaHlaska;
-        emit odesliChybovouHlasku(chybovaHlaska);
-    }
-
-
-}
-/*
-void Soubor::zapisRadekCsv(QString vstup)
-{
-    QFile file(cestaSouboruHtml);
-    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
-    {
-        // We're going to streaming text to the file
-        QTextStream stream(&file);
-
-        stream << vstup;
-        //stream << "ahoj";
-        file.close();
-        QString zapsano="Writing finished";
-        qDebug() << zapsano;
-        emit odesliChybovouHlasku(zapsano);
-    }
-    else
-    {
-        QString chybovaHlaska="soubor nelze zapsat";
-        qDebug()<<chybovaHlaska;
-        emit odesliChybovouHlasku(chybovaHlaska);
-    }
-
-
-}
-*/
-
-/*
-void Soubor::zavriCsv(QString vstup)
-{
-    QFile file(cestaSouboruHtml);
-    //if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
-    {
-        // We're going to streaming text to the file
-        QTextStream stream(&file);
-
-        stream << vstup;
-        //stream << "ahoj";
-        file.close();
-        QString zapsano="Writing finished";
-        qDebug() << zapsano;
-        emit odesliChybovouHlasku(zapsano);
-    }
-    else
-    {
-        QString chybovaHlaska="soubor nelze zapsat";
-        qDebug()<<chybovaHlaska;
-        emit odesliChybovouHlasku(chybovaHlaska);
-    }
-
-
-}
-*/
 
 
 int Soubor::spocitejRadkySouboru(QString fileName)
 {
-    qDebug()<<"spocitejRadkySouboru";
-
+    qDebug()<<Q_FUNC_INFO;
     // zdroj: https://stackoverflow.com/questions/5444959/read-a-text-file-line-by-line-in-qt
     QFile inputFile(fileName);
 
@@ -757,4 +649,41 @@ int Soubor::spocitejRadkySouboru(QString fileName)
 }
 
 
+QString Soubor::vektorStringuOddelovac(QVector<QString> vstup, QString oddelovac)
+{
+    QString vystup="";
+    if (vstup.isEmpty())
+    {
+        return "";
+    }
+    if (vstup.count()==1)
+    {
+        return vstup.first();
+    }
 
+    for(int i=0;i<vstup.count()-1;i++)
+    {
+       vystup+=vstup.at(i)+oddelovac;
+    }
+    vystup+=vstup.last();
+    return vystup;
+}
+
+
+
+QString Soubor::zmenPriponu(QString vstup,QString pripona)
+{
+    if (vstup.isEmpty())
+    {
+        return "";
+    }
+
+    QString zbytek=vstup.split(".").first();
+    QString staraPripona=vstup.split(".").last();
+
+     qDebug()<<"zbytek: "<<zbytek<<" pripona: "<<staraPripona;
+
+   QString vystup=zbytek+"."+pripona;
+
+    return vystup;
+}

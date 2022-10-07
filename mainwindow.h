@@ -24,16 +24,16 @@ public:
 
     QString loadFromFile();
     void resetujProgressBar();
+
 public slots:
     void pridejChybuDoOkna(QString vstup);
     void slotNastavProgressCteni(int hodnota);
     void slotNastavProgressZapis(int hodnota);
 private slots:
     void on_pushButton_process_clicked();
-
-    void on_pushButtonInputFile_clicked();
-
+    void on_pushButton_inputFile_clicked();
     void on_pushButton_outputFile_clicked();
+    void on_pushButton_najdiHlavicky_clicked();
 
 private:
     Ui::MainWindow *ui;
