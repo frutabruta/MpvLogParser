@@ -35,7 +35,7 @@ public:
 
 
   QMap<QString, QString>  Obsah;
-
+    QVector<QString> toQVectorQString(QVector<QString> hlavicka);
 
 
 
@@ -48,6 +48,8 @@ public:
    static QString vypisCsvHlavicka(QVector<QString> hlavicka);
 
 
+
+private:
 
 };
 

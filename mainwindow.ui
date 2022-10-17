@@ -64,7 +64,7 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Vstupní soubor</string>
+           <string>Vstupní soubor (*.log)</string>
           </property>
          </widget>
         </item>
@@ -114,7 +114,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>Výstupní sqlite (zatím neimplementováno)</string>
@@ -124,16 +124,16 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLineEdit" name="lineEdit_3">
+           <widget class="QLineEdit" name="lineEdit_cestaSqLite">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="pushButton_fileSqLite">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Otevři</string>

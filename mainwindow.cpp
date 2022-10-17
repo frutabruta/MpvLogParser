@@ -58,6 +58,7 @@ void MainWindow::on_pushButton_process_clicked()
 
     soubor.cestaSouboruLog=ui->lineEdit_cestaLog->text();
     soubor.cestaSouboruCsv=ui->lineEdit_cestaCsv->text();
+    soubor.cestaSouboruSqLite=ui->lineEdit_cestaSqLite->text();
 
     soubor.sloupecky=ui->lineEdit_formatHlavicky->text();
    // soubor.otevriSoubor();
@@ -73,19 +74,32 @@ void MainWindow::on_pushButton_process_clicked()
 }
 
 
-QString MainWindow::saveToFile()
+QString MainWindow::saveToFile(QString fileType,QString popis)
 {
+    QString str1 = popis+" (*."+fileType+");;All Files (*)";
+    QByteArray ba = str1.toLocal8Bit();
+    const char *c_str2 = ba.data();
+
+
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     tr("Ulož soubor"), "",
-                                                    tr("Comma separated value (*.csv);;All Files (*)"));
+                                                    tr(c_str2));
     return fileName;
 }
 
-QString MainWindow::loadFromFile()
-{
+QString MainWindow::loadFromFile(QString fileType, QString popis)
+{   
+
+    QString str1 = popis+" (*."+fileType+");;All Files (*)";
+    QByteArray ba = str1.toLocal8Bit();
+    const char *c_str2 = ba.data();
+
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Otevři soubor"), "",
-                                                    tr("Soubor logu (*.log);;All Files (*)"));
+                                                    tr(c_str2));
+    //tr("Soubor logu (*.log);;All Files (*)"));
+
+
     return fileName;
 }
 
@@ -94,16 +108,24 @@ QString MainWindow::loadFromFile()
 
 void MainWindow::on_pushButton_inputFile_clicked()
 {
-    soubor.cestaSouboruLog=this->loadFromFile();
+    soubor.cestaSouboruLog=this->loadFromFile("log","Soubor logu");
+
     ui->lineEdit_cestaCsv->setText(soubor.zmenPriponu(soubor.cestaSouboruLog,"csv"));
+    ui->lineEdit_cestaSqLite->setText(soubor.zmenPriponu(soubor.cestaSouboruLog,"sqlite"));
     ui->lineEdit_cestaLog->setText( soubor.cestaSouboruLog);
 }
 
 
 void MainWindow::on_pushButton_outputFile_clicked()
 {
-    soubor.cestaSouboruCsv=this->saveToFile();
+    soubor.cestaSouboruCsv=this->saveToFile("csv","Comma separated value ");
     ui->lineEdit_cestaCsv->setText(soubor.cestaSouboruCsv);
+}
+
+void MainWindow::on_pushButton_fileSqLite_clicked()
+{
+    soubor.cestaSouboruSqLite=this->saveToFile("sqlite","SQLite databáze ");
+    ui->lineEdit_cestaSqLite->setText(soubor.cestaSouboruSqLite);
 }
 
 void MainWindow::pridejChybuDoOkna(QString vstup)
@@ -130,4 +152,6 @@ void MainWindow::on_pushButton_najdiHlavicky_clicked()
 
 
 }
+
+
 

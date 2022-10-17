@@ -1,18 +1,15 @@
 #ifndef SOUBOR_H
 #define SOUBOR_H
 
-
 #include "zaznammpvlogu.h"
 #include <QObject>
 #include <QtXml>
-
-
-
-
 #include <QtDebug>
 #include <QFile>
-#include <QtXml>
 #include <QApplication>
+
+
+#include "XmlRopidImportStream/sqlitezaklad.h"
 
 class Soubor : public QObject
 {
@@ -30,6 +27,7 @@ public:
 
     QString cestaSouboruLog="";
     QString cestaSouboruCsv="";
+    QString cestaSouboruSqLite="";
     QString sloupecky="";
     QFile file;
 
@@ -41,13 +39,15 @@ public:
     //nezarazeno
 
     QString zmenPriponu(QString vstup, QString pripona);
+    bool zalozSqlTabulku(QString nazevTabulky, QVector<QString> sloupecky);
+
 private:
 
     //instance knihoven
     //promenne
     //funkce
     void csvOtevri();
-    void csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file);
+    void csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file, SqLiteZaklad &sqLiteZaklad);
     void csvZapisKomplet(QString vstup);
     void csvZapisKonec(QFile &file);
     void csvZapisSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup);

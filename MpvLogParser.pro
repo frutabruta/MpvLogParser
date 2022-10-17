@@ -1,5 +1,6 @@
 QT       += core gui
 QT += xml
+QT += sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -12,12 +13,16 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     soubor.cpp \
-    zaznammpvlogu.cpp
+    zaznammpvlogu.cpp \
+    XmlRopidImportStream\sqlitezaklad.cpp \
+    XmlRopidImportStream\xmlropidimportstream.cpp
 
 HEADERS += \
     mainwindow.h \
     soubor.h \
-    zaznammpvlogu.h
+    zaznammpvlogu.h \
+    XmlRopidImportStream\sqlitezaklad.h \
+    XmlRopidImportStream\xmlropidimportstream.h
 
 FORMS += \
     mainwindow.ui

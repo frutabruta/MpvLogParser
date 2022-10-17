@@ -20,9 +20,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    QString saveToFile();
+    QString saveToFile(QString fileType, QString popis);
 
-    QString loadFromFile();
+    QString loadFromFile(QString fileType, QString popis);
     void resetujProgressBar();
 
 public slots:
@@ -34,6 +34,8 @@ private slots:
     void on_pushButton_inputFile_clicked();
     void on_pushButton_outputFile_clicked();
     void on_pushButton_najdiHlavicky_clicked();
+
+    void on_pushButton_fileSqLite_clicked();
 
 private:
     Ui::MainWindow *ui;
