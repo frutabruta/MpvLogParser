@@ -43,6 +43,7 @@ private:
 
     QByteArray obsahSouboru;
 
+    QString textVerze();
 signals:
     void signalSpustitImport(QString parametr);
 };

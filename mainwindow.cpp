@@ -16,9 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this,&MainWindow::signalSpustitImport,&soubor,&Soubor::slotSouborNaRadky2);
 
 
-    QString compilationTime = QString("%1T%2").arg(__DATE__,__TIME__);
-    ui->label_verze->setText(compilationTime);
 
+    ui->label_verze->setText(textVerze());
+    ui->label_verze->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
 
     resetujProgressBar();
@@ -160,4 +160,11 @@ void MainWindow::on_pushButton_najdiHlavicky_clicked()
 }
 
 
-
+QString MainWindow::textVerze()
+{
+    QDate datumKompilace=QLocale("en_US").toDate(QString(__DATE__).simplified(), "MMM d yyyy");
+    QTime casKompilace=QTime::fromString(__TIME__,"hh:mm:ss");
+    qDebug()<<" date:"<<datumKompilace<<" time:"<<casKompilace;
+    QString verze=datumKompilace.toString("yyyyMMdd")+"_"+casKompilace.toString("hhmm");
+    return verze;
+}
