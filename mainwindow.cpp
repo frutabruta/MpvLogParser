@@ -54,8 +54,9 @@ void MainWindow::slotNastavProgressZapis(int hodnota)
 
 void MainWindow::on_pushButton_process_clicked()
 {
-    pridejChybuDoOkna("Zacatek importu:"+QTime::currentTime().toString() );
 
+    QTime zacatek=QTime::currentTime();
+    pridejChybuDoOkna("Zacatek importu:"+zacatek.toString() );
     soubor.cestaSouboruLog=ui->lineEdit_cestaLog->text();
     soubor.cestaSouboruCsv=ui->lineEdit_cestaCsv->text();
     soubor.cestaSouboruSqLite=ui->lineEdit_cestaSqLite->text();
@@ -68,7 +69,12 @@ void MainWindow::on_pushButton_process_clicked()
 
 
     emit signalSpustitImport(soubor.cestaSouboruLog);
-    pridejChybuDoOkna("Konec importu:"+QTime::currentTime().toString() );
+
+    QTime konec=QTime::currentTime();
+
+    pridejChybuDoOkna("Konec importu:"+konec.toString()+" \n import trval vterin: "+QString::number(zacatek.secsTo(konec)) );
+
+   // pridejChybuDoOkna("Konec importu:"+QTime::currentTime().toString() );
 
 
 }

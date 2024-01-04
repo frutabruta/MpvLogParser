@@ -22,21 +22,21 @@ QString ZaznamMpvLogu::vypis()
     vystup+="zaznam ";
 
 
-    vystup+=this->Obsah.value("imei");
+    vystup+=this->obsah.value("imei");
     vystup+" ";
-    vystup+=this->Obsah.value("rz");
+    vystup+=this->obsah.value("rz");
     vystup+" ";
-    vystup+=this->Obsah.value("pkt");
+    vystup+=this->obsah.value("pkt");
     vystup+" ";
-    vystup+=this->Obsah.value("lat");
+    vystup+=this->obsah.value("lat");
     vystup+" ";
-    vystup+=this->Obsah.value("lng");
+    vystup+=this->obsah.value("lng");
     vystup+" ";
-    vystup+=this->Obsah.value("tm");
+    vystup+=this->obsah.value("tm");
     vystup+" ";
-    vystup+=this->Obsah.value("events");
+    vystup+=this->obsah.value("events");
     vystup+" ";
-    vystup+=this->Obsah.value("rych");
+    vystup+=this->obsah.value("rych");
 
 
     return vystup;
@@ -59,12 +59,12 @@ QString ZaznamMpvLogu::vypisCsvRadek(QVector<QString> hlavicka)
 
     for(int i=0;i<hlavicka.count()-1;i++)
     {
-        vystup+=escape(this->Obsah.value(hlavicka.at(i)));
+        vystup+=escape(this->obsah.value(hlavicka.at(i)));
        // qDebug()<<"polozka "<<polozka;
 
         vystup+=separator;
     }
-    vystup+=escape(this->Obsah.value(hlavicka.last()));
+    vystup+=escape(this->obsah.value(hlavicka.last()));
 
 
     vystup+="\n";
@@ -90,7 +90,7 @@ QVector<QString> ZaznamMpvLogu::toQVectorQString(QVector<QString> hlavicka)
 
     foreach(QString polozkaHlavicky, hlavicka)
     {
-        vystup.push_back(escape(this->Obsah.value(polozkaHlavicky)));
+        vystup.push_back(escape(this->obsah.value(polozkaHlavicky)));
        // qDebug()<<"polozka "<<polozka;
 
 

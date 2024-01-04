@@ -468,7 +468,6 @@ QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloR
     int pocetElementu=elementy.count();
     if (pocetElementu==0)
     {
-
         qDebug()<<"elementy nejsou na radku:"<<QString::number(cisloRadku);
         return seznamSloupecku;
     }
@@ -534,7 +533,8 @@ int Soubor::slotSouborNaRadky2(QString fileName)
         while (!in.atEnd())
         {
             QString line = in.readLine();
-            QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
+       //     QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
+            QVector<ZaznamMpvLogu> zaznamy=logZpracujRadekStream(line,counter);
 
             counter++;
 
@@ -615,9 +615,22 @@ ZaznamMpvLogu Soubor::qDomElementToZaznamMpvLogu(QDomElement vstup)
         QString atribut=vstup.attributes().item(i).nodeName();
         QString hodnota=vstup.attributes().item(i).nodeValue();
         // qDebug()<<" vypis atributu "<<atribut<<" "<<hodnota;
-        zaznam.Obsah.insert(atribut,hodnota);
+        zaznam.obsah.insert(atribut,hodnota);
     }
     // qDebug()<<"konec Soubor::qDomElementToZaznamMpvLogu";
+    return zaznam;
+}
+
+ZaznamMpvLogu Soubor::attributesToZaznamMpvLogu(QXmlStreamAttributes vstup)
+{
+    ZaznamMpvLogu zaznam;
+
+    foreach(QXmlStreamAttribute hhh, vstup)
+    {
+
+        zaznam.obsah.insert(hhh.name().toString(),hhh.value().toString());
+    }
+
     return zaznam;
 }
 
@@ -685,3 +698,122 @@ QString Soubor::zmenPriponu(QString vstup,QString pripona)
 
     return vystup;
 }
+
+
+
+
+QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRadku)
+{
+    //  qDebug()<<Q_FUNC_INFO;
+    int zacatek =radek.indexOf("<");
+    QString orezanyRadek;
+    QVector<ZaznamMpvLogu> zaznamy2;
+    if (zacatek<0)
+    {
+        qDebug()<<"zadna zprava na radku "<<QString::number(cisloRadku);
+        return zaznamy2;
+    }
+    else
+    {
+        orezanyRadek=radek.mid(zacatek);
+        //  qDebug()<<" orezany radek "<<orezanyRadek;
+    }
+
+
+
+
+    ////////////////////////
+
+    QXmlStreamReader reader(orezanyRadek);
+    QTextStream errorStream(stderr);
+
+    QString staryTag="";
+
+
+    reader.readElementText(QXmlStreamReader::IncludeChildElements);
+
+    QXmlStreamAttributes atributyObehu;
+
+
+    QVector<QString> obsah;
+    int pocetElementu=0;
+
+    while (!reader.atEnd()) {
+
+        auto currentToken = reader.tokenString();
+        QXmlStreamAttributes atributy=reader.attributes();
+
+        if(currentToken=="StartElement")
+        {
+            if(staryTag=="")
+            {
+                staryTag=reader.name().toString();
+            }
+
+            if((staryTag!=reader.name().toString())&&(!obsah.contains(reader.name().toString())))
+            {
+              //  QString hlaska="Zpracovavam tag: "+reader.name().toString();
+             //   qDebug()<<hlaska;
+                staryTag=reader.name().toString();
+                obsah.push_back(staryTag);
+             //   emit odesliChybovouHlasku(hlaska);
+            }
+
+            if(reader.name()==QString("V"))
+            {
+
+                pocetElementu++;
+                ZaznamMpvLogu vysledek=attributesToZaznamMpvLogu(atributy);
+                zaznamy2.push_back(vysledek);
+
+
+            }
+
+
+
+
+            /*
+                    else if(reader.name()=="")
+                    {
+                      vlozNew(atributy);
+                    }
+
+                 */
+
+        }
+        else if(currentToken=="EndElement")
+        {
+            if(reader.name()==QString("s"))
+            {
+                // aktualniCisloSpoje=0;
+                //  xCounter=0;
+            }
+            if(reader.name()==QString("o"))
+            {
+                //   vlozSpPo(atributyObehu,navazneSpojeObehu);
+            }
+        }
+
+      //  emit signalNastavProgress(reader.lineNumber());
+        reader.readNext();
+    }
+
+
+
+    /////////////////////////
+
+
+
+
+
+    if (pocetElementu==0)
+    {
+        qDebug()<<"elementy nejsou na radku:"<<QString::number(cisloRadku);
+
+    }
+
+    return zaznamy2;
+}
+
+
+

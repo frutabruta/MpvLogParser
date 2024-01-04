@@ -41,6 +41,9 @@ public:
     QString zmenPriponu(QString vstup, QString pripona);
     bool zalozSqlTabulku(QString nazevTabulky, QVector<QString> sloupecky);
 
+    void natahniLog(QString radek);
+    ZaznamMpvLogu attributesToZaznamMpvLogu(QXmlStreamAttributes vstup);
+    QVector<ZaznamMpvLogu> logZpracujRadekStream(QString radek, int cisloRadku);
 private:
 
     //instance knihoven
