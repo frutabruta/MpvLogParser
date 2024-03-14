@@ -44,7 +44,7 @@ void Soubor::csvZapisSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup)
     QFile file(cestaSouboruCsv);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
 
-        // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+            // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
     {
         // We're going to streaming text to the file
         QTextStream stream(&file);
@@ -368,7 +368,7 @@ QString Soubor::htmlStyl()
 
 
 
-
+//unused
 QVector<ZaznamMpvLogu> Soubor::logSouborNaRadky(QString fileName)
 {
     qDebug()<<Q_FUNC_INFO;
@@ -463,7 +463,36 @@ QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloR
     soubor.setContent(orezanyRadek);
     QDomElement koren;
     koren=soubor.firstChildElement();
+
+
+    /////outer
+
+
+
+    QDomNamedNodeMap atributyParent= koren.toElement().attributes();
+
+    for(int i=0;i<atributyParent.length();i++)
+    {
+        QString nazevAtributu= atributyParent.item(i).nodeName();
+        if(!seznamSloupecku.contains(nazevAtributu))
+        {
+            if(nazevAtributu!="")
+            {
+                seznamSloupecku.push_back(nazevAtributu);
+                qDebug()<<"novy atribut: "<<nazevAtributu;
+
+            }
+        }
+    }
+
+
+
+    ///// inner
     QDomNodeList elementy=koren.elementsByTagName("V");
+    if(elementy.isEmpty())
+    {
+        elementy=koren.elementsByTagName("vlak");
+    }
 
     int pocetElementu=elementy.count();
     if (pocetElementu==0)
@@ -494,6 +523,7 @@ QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloR
 
         }
     }
+    ////////
 
     return seznamSloupecku;
 }
@@ -533,7 +563,7 @@ int Soubor::slotSouborNaRadky2(QString fileName)
         while (!in.atEnd())
         {
             QString line = in.readLine();
-       //     QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
+            //     QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
             QVector<ZaznamMpvLogu> zaznamy=logZpracujRadekStream(line,counter);
 
             counter++;
@@ -732,11 +762,13 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
 
     reader.readElementText(QXmlStreamReader::IncludeChildElements);
 
-    QXmlStreamAttributes atributyObehu;
+    QXmlStreamAttributes atributyZprava;
 
 
     QVector<QString> obsah;
     int pocetElementu=0;
+
+
 
     while (!reader.atEnd()) {
 
@@ -752,11 +784,11 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
 
             if((staryTag!=reader.name().toString())&&(!obsah.contains(reader.name().toString())))
             {
-              //  QString hlaska="Zpracovavam tag: "+reader.name().toString();
-             //   qDebug()<<hlaska;
+                //  QString hlaska="Zpracovavam tag: "+reader.name().toString();
+                //   qDebug()<<hlaska;
                 staryTag=reader.name().toString();
                 obsah.push_back(staryTag);
-             //   emit odesliChybovouHlasku(hlaska);
+                //   emit odesliChybovouHlasku(hlaska);
             }
 
             if(reader.name()==QString("V"))
@@ -768,6 +800,26 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
 
 
             }
+            if(reader.name()==QString("vlak"))
+            {
+
+                pocetElementu++;
+                atributy.append(atributyZprava);
+                ZaznamMpvLogu vysledek=attributesToZaznamMpvLogu(atributy);
+                zaznamy2.push_back(vysledek);
+
+
+            }
+            if(reader.name()==QString("m"))
+            {
+
+                pocetElementu++;
+                atributyZprava=atributy;
+                //zaznamy2.push_back(vysledek);
+
+
+            }
+
 
 
 
@@ -794,7 +846,7 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
             }
         }
 
-      //  emit signalNastavProgress(reader.lineNumber());
+        //  emit signalNastavProgress(reader.lineNumber());
         reader.readNext();
     }
 

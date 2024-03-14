@@ -62,7 +62,7 @@ void MainWindow::on_pushButton_process_clicked()
     soubor.cestaSouboruSqLite=ui->lineEdit_cestaSqLite->text();
 
     soubor.sloupecky=ui->lineEdit_formatHlavicky->text();
-   // soubor.otevriSoubor();
+    // soubor.otevriSoubor();
     resetujProgressBar();
     ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
     ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
@@ -74,7 +74,7 @@ void MainWindow::on_pushButton_process_clicked()
 
     pridejChybuDoOkna("Konec importu:"+konec.toString()+" \n import trval vterin: "+QString::number(zacatek.secsTo(konec)) );
 
-   // pridejChybuDoOkna("Konec importu:"+QTime::currentTime().toString() );
+    // pridejChybuDoOkna("Konec importu:"+QTime::currentTime().toString() );
 
 
 }
@@ -146,13 +146,13 @@ void MainWindow::on_pushButton_najdiHlavicky_clicked()
 
     soubor.cestaSouboruLog=ui->lineEdit_cestaLog->text();
     soubor.cestaSouboruCsv=ui->lineEdit_cestaCsv->text();
-   // soubor.otevriSoubor();
+    // soubor.otevriSoubor();
     resetujProgressBar();
     ui->progressBar2->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
     ui->progressBar3->setMaximum(soubor.spocitejRadkySouboru(soubor.cestaSouboruLog));
 
 
-   // emit signalSpustitImport(soubor.cestaSouboruHex);
+    // emit signalSpustitImport(soubor.cestaSouboruHex);
     pridejChybuDoOkna("Konec hledani hlavicek:"+QTime::currentTime().toString() );
     ui->lineEdit_formatHlavicky->setText(soubor.slotLogVyrobSeznamSloupecku(soubor.cestaSouboruLog));
 
