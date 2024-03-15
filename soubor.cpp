@@ -493,6 +493,13 @@ QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloR
     {
         elementy=koren.elementsByTagName("vlak");
     }
+    if(elementy.isEmpty())
+    {
+        if(koren.nodeName()=="position")
+        {
+            elementy=soubor.elementsByTagName("position");
+        }
+    }
 
     int pocetElementu=elementy.count();
     if (pocetElementu==0)
@@ -800,6 +807,8 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
 
 
             }
+
+            // metro
             if(reader.name()==QString("vlak"))
             {
 
@@ -816,9 +825,20 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
                 pocetElementu++;
                 atributyZprava=atributy;
                 //zaznamy2.push_back(vysledek);
+            }
 
+            //vlaky
+            if(reader.name()==QString("position"))
+            {
+
+                pocetElementu++;
+              //  atributy.append(atributyZprava);
+                ZaznamMpvLogu vysledek=attributesToZaznamMpvLogu(atributy);
+                zaznamy2.push_back(vysledek);
+                qDebug()<<"position";
 
             }
+
 
 
 

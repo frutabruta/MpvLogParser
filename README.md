@@ -2,6 +2,10 @@
 Utility to convert non-standard XML logs (*.log) from MPVnet dispaching system to CSV and .SQLITE databases.
 ## Changelog
 - 20240314_1744
+    - ability to load logs from Telematika channel
+        - Soubor::logZpracujRadekHledejHlavicky
+        - Soubor::logZpracujRadekStream
+- 20240314_1744
     - ability to load metro log format (m/vlak tags)
     - new version of XmlRopidImportStream
 - 20240104_1323
