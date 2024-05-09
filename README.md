@@ -1,6 +1,8 @@
 # MpvLogParser
 Utility to convert non-standard XML logs (*.log) from MPVnet dispaching system to CSV and .SQLITE databases.
 ## Changelog
+- 20240509_1535
+    - added icon
 - 20240314_1744
     - ability to load logs from Telematika channel
         - Soubor::logZpracujRadekHledejHlavicky
