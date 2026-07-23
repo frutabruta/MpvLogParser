@@ -9,7 +9,7 @@ public:
     ZaznamMpvLogu();
 
     QMap<QString, QString>  obsah;
-    QVector<QString> toQVectorQString(QVector<QString> hlavicka);
+    QVector<QString> toQVectorQString(QVector<QString> &hlavicka);
 
     QString vypis();
     QString vypisCsvRadek(QVector<QString> hlavicka);

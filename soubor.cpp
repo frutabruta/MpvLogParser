@@ -44,7 +44,7 @@ void Soubor::csvZapisSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup)
     QFile file(cestaSouboruCsv);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
 
-            // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    // if(file.open(QIODevice::WriteOnly | QIODevice::Append))
     {
         // We're going to streaming text to the file
         QTextStream stream(&file);
@@ -117,15 +117,76 @@ bool Soubor::csvZapisZacatek(QVector<QString> &hlavicka, QFile &file)
     return 0;
 }
 
-void Soubor::csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file, SqLiteZaklad &sqLiteZaklad)
+void Soubor::csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> &hlavicka, QFile &file, SqLiteBase &sqLiteZaklad)
 {
     QTextStream stream(&file);
 
     int pocetZaznamu=vstup.count();
+    QString nazevTabulky="vozidlo";
+
+    /////////////////
+
+
+    //qDebug() << Q_FUNC_INFO;
+    /*
+    if (hlavicka.size() != data.size())
+    {
+        qDebug() << "insertDataRow failed: header/data size mismatch";
+        qDebug() << "hlavicka size:" << hlavicka.size();
+        qDebug() << "data size:" << data.size();
+        return false;
+    }*/
+
+    if (!sqLiteZaklad.dbFile.isOpen())
+    {
+        qDebug() << "insertDataRow failed: database is not open";
+        qDebug() << sqLiteZaklad.dbFile.lastError().text();
+        return;
+    }
+
+    QString safeTableName = sqLiteZaklad.sanitizeSqlIdentifier(nazevTabulky);
+
+    QVector<QString> safeColumns;
+    QVector<QString> placeholders;
+
+    for (int i = 0; i < hlavicka.size(); i++)
+    {
+        safeColumns.append(sqLiteZaklad.sanitizeSqlIdentifier(hlavicka.at(i)));
+        placeholders.append("?");
+    }
+
+    QString queryText = QString("INSERT INTO %1 (%2) VALUES (%3);")
+                            .arg(
+                                safeTableName,
+                                safeColumns.join(","),
+                                placeholders.join(",")
+                                );
+
+    //qDebug() << queryText;
+
+    QSqlQuery query(sqLiteZaklad.dbFile);
+
+    if (!query.prepare(queryText))
+    {
+        qDebug() << "Prepare failed:";
+        qDebug() << query.lastError().text();
+        qDebug() << queryText;
+        return;
+    }
+
+
+
+
+
+    ////////
+
+
     for(int i=0;i<pocetZaznamu;i++)
     {
         stream <<vstup[i].vypisCsvRadek(hlavicka);
-        sqLiteZaklad.vlozRadekDat("vozidlo",hlavicka,vstup[i].toQVectorQString(hlavicka));
+       // sqLiteZaklad.insertDataRow("vozidlo",hlavicka,vstup[i].toQVectorQString(hlavicka));
+
+        sqLiteZaklad.insertDataRow(query,vstup[i].toQVectorQString(hlavicka));
         emit this->nastavProgressZapis(i);
     }
 }
@@ -550,48 +611,77 @@ int Soubor::slotSouborNaRadky2(QString fileName)
     QVector<QString> hlavicka;
     csvZapisZacatek(hlavicka,csvcko);
 
-    SqLiteZaklad sqLiteZaklad;
-    sqLiteZaklad.cestaKomplet=cestaSouboruSqLite;
-    sqLiteZaklad.pripoj();
-    if(!sqLiteZaklad.zahajTransakci())
+    SqLiteBase sqLiteZaklad;
+    sqLiteZaklad.dbFilePath=cestaSouboruSqLite;
+
+
+    if(!sqLiteZaklad.initialize())
     {
-        qDebug()<<"transakci se nepovedlo zahajit";
+        qDebug()<<"initialization failed";
+        return 0;
     }
-
-
-    if (inputFile.open(QIODevice::ReadOnly))
+    else
     {
-
-        //   qDebug()<<"soubor ma "<<counter<<" radku";
-        sqLiteZaklad.zrusSqlTabulku("vozidlo",hlavicka);
-        sqLiteZaklad.zalozSqlTabulku("vozidlo",hlavicka);
-
-        QTextStream in(&inputFile);
-        while (!in.atEnd())
+        if(!sqLiteZaklad.transactionStart())
         {
-            QString line = in.readLine();
-            //     QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
-            QVector<ZaznamMpvLogu> zaznamy=logZpracujRadekStream(line,counter);
+            qDebug()<<"transakci se nepovedlo zahajit";
+            return 0;
+        }
+        else
+        {
+            qDebug() << "transaction started:" << sqLiteZaklad.dbFile.driver()->hasFeature(QSqlDriver::Transactions);
+            if (inputFile.open(QIODevice::ReadOnly))
+            {
 
-            counter++;
+                //   qDebug()<<"soubor ma "<<counter<<" radku";
+                sqLiteZaklad.tableDelete("vozidlo",hlavicka);
 
-            csvZapisJedenRadek(zaznamy,hlavicka,csvcko, sqLiteZaklad);
+                if(!sqLiteZaklad.tableCreate("vozidlo",hlavicka))
+                {
+                    qDebug()<<"Failed to create table";
+                    inputFile.close();
+                    return false;
+                }
 
-            emit this->nastavProgressCteni(counter);
-            qApp->processEvents();
 
+                QTextStream in(&inputFile);
+                while (!in.atEnd())
+                {
+                    QString line = in.readLine();
+                    //     QVector<ZaznamMpvLogu> zaznamy=logZpracujRadek(line,counter);
+                    QVector<ZaznamMpvLogu> zaznamy=logZpracujRadekStream(line,counter);
+
+                    counter++;
+
+                    csvZapisJedenRadek(zaznamy,hlavicka,csvcko, sqLiteZaklad);
+
+                    emit this->nastavProgressCteni(counter);
+                    qApp->processEvents();
+
+
+                    /*
+                    if ((counter % 1000) == 0)
+                    {
+                        qApp->processEvents();
+                    }
+*/
+
+                }
+
+                inputFile.close();
+            }
+
+            sqLiteZaklad.transactionStop();
+            sqLiteZaklad.dbClose();
+
+            csvZapisKonec(csvcko);
         }
 
-        inputFile.close();
+        qDebug()<<"konec soubornaRadky";
+        return counter;
     }
 
-    sqLiteZaklad.ukonciTransakci();
-    sqLiteZaklad.zavriDB();
 
-    csvZapisKonec(csvcko);
-
-    qDebug()<<"konec soubornaRadky";
-    return counter;
 }
 
 QString Soubor::slotLogVyrobSeznamSloupecku(QString fileName)
@@ -832,7 +922,7 @@ QVector<ZaznamMpvLogu> Soubor::logZpracujRadekStream(QString radek, int cisloRad
             {
 
                 pocetElementu++;
-              //  atributy.append(atributyZprava);
+                //  atributy.append(atributyZprava);
                 ZaznamMpvLogu vysledek=attributesToZaznamMpvLogu(atributy);
                 zaznamy2.push_back(vysledek);
                 qDebug()<<"position";

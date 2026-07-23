@@ -1,6 +1,12 @@
 # MpvLogParser
 Utility to convert non-standard XML logs (*.log) from MPVnet dispaching system to CSV and .SQLITE databases.
 ## Changelog
+- 20260723_1735
+  - Soubor::csvZapisJedenRadek
+    - reworked to allow faster import 
+  - Soubor::slotSouborNaRadky2
+    - transaction enforcement
+  
 - 20240509_1535
     - added icon
 - 20240314_1744

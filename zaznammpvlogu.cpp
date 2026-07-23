@@ -73,7 +73,7 @@ QString ZaznamMpvLogu::vypisCsvRadek(QVector<QString> hlavicka)
 }
 
 
-QVector<QString> ZaznamMpvLogu::toQVectorQString(QVector<QString> hlavicka)
+QVector<QString> ZaznamMpvLogu::toQVectorQString(QVector<QString> &hlavicka)
 {
   //  qDebug()<<"ZaznamMpvLogu::vypisCsv()";
     QVector<QString> vystup;
@@ -135,8 +135,6 @@ QString ZaznamMpvLogu::escape(QString vstup)
 {
     QString vystup;
     vystup= "\""+vstup+"\"";
-
-
     return vystup;
 }
 

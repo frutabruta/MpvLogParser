@@ -10,20 +10,20 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    XmlRopidImportStream/sqlitebase.cpp \
+    XmlRopidImportStream\xmlropidimportstream.cpp \
     main.cpp \
     mainwindow.cpp \
     soubor.cpp \
-    zaznammpvlogu.cpp \
-    XmlRopidImportStream\sqlitezaklad.cpp \
-    XmlRopidImportStream\xmlropidimportstream.cpp
+    zaznammpvlogu.cpp
 
 HEADERS += \
+    XmlRopidImportStream/sqlitebase.h \
+    XmlRopidImportStream\xmlropidimportstream.h \
     mainwindow.h \
     soubor.h \
-    zaznammpvlogu.h \
-    XmlRopidImportStream\sqlitezaklad.h \
-    XmlRopidImportStream\xmlropidimportstream.h
-
+    zaznammpvlogu.h
+    
 FORMS += \
     mainwindow.ui
 

@@ -9,7 +9,7 @@
 #include <QApplication>
 
 
-#include "XmlRopidImportStream/sqlitezaklad.h"
+#include "XmlRopidImportStream/sqlitebase.h"
 
 class Soubor : public QObject
 {
@@ -50,7 +50,7 @@ private:
     //promenne
     //funkce
     void csvOtevri();
-    void csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> hlavicka, QFile &file, SqLiteZaklad &sqLiteZaklad);
+    void csvZapisJedenRadek(QVector<ZaznamMpvLogu> &vstup, QVector<QString> &hlavicka, QFile &file, SqLiteBase &sqLiteZaklad);
     void csvZapisKomplet(QString vstup);
     void csvZapisKonec(QFile &file);
     void csvZapisSeznamZaznamu(QVector<ZaznamMpvLogu> &vstup);
