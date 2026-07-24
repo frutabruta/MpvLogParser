@@ -25,6 +25,11 @@ public:
     QString loadFromFile(QString fileType, QString popis);
     void resetujProgressBar();
 
+
+    QString cestaSouboruLog="";
+    QString cestaSouboruCsv="";
+    QString cestaSouboruSqLite="";
+
 public slots:
     void pridejChybuDoOkna(QString vstup);
     void slotNastavProgressCteni(int hodnota);
@@ -37,13 +42,15 @@ private slots:
 
     void on_pushButton_fileSqLite_clicked();
 
+    void slotResultReady(bool result);
 private:
     Ui::MainWindow *ui;
-    Soubor soubor;
+    //Soubor soubor;
 
     QByteArray obsahSouboru;
 
     QString textVerze();
+    QTime zacatek;
 signals:
     void signalSpustitImport(QString parametr);
 };

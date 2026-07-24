@@ -11,9 +11,15 @@
 
 #include "XmlRopidImportStream/sqlitebase.h"
 
-class Soubor : public QObject
+class Soubor : public QThread
 {
     Q_OBJECT
+
+    void run() override {
+        /* ... here is the expensive or blocking operation ... */
+        slotSouborNaRadky2(cestaSouboruLog);
+        emit signalResultReady(true);
+    }
 
 public:
 
@@ -34,11 +40,11 @@ public:
     //funkce
     void otevriSoubor();
 
-    int spocitejRadkySouboru(QString fileName);
+    static int spocitejRadkySouboru(QString fileName);
 
     //nezarazeno
 
-    QString zmenPriponu(QString vstup, QString pripona);
+    static QString zmenPriponu(QString vstup, QString pripona);
     bool zalozSqlTabulku(QString nazevTabulky, QVector<QString> sloupecky);
 
     void natahniLog(QString radek);
@@ -84,6 +90,7 @@ signals:
     void odesliChybovouHlasku(QString chybovaHlaska);
     void nastavProgressCteni(int vstup);
     void nastavProgressZapis(int vstup);
+    void signalResultReady(bool result);
 
 };
 

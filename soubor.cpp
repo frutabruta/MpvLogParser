@@ -1,7 +1,7 @@
 #include "soubor.h"
 
 
-Soubor::Soubor(QObject *parent) : QObject(parent)
+Soubor::Soubor(QObject *parent)
 {
     qDebug()<<Q_FUNC_INFO;
     QString nazevSouboru="soubor.log";
@@ -656,7 +656,7 @@ int Soubor::slotSouborNaRadky2(QString fileName)
                     csvZapisJedenRadek(zaznamy,hlavicka,csvcko, sqLiteZaklad);
 
                     emit this->nastavProgressCteni(counter);
-                    qApp->processEvents();
+                    //qApp->processEvents();
 
 
                     /*
