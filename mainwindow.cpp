@@ -88,6 +88,8 @@ void MainWindow::slotResultReady(bool result)
 {
     QTime konec=QTime::currentTime();
     pridejChybuDoOkna("Konec importu:"+konec.toString()+" \n import trval vterin: "+QString::number(zacatek.secsTo(konec)) );
+    ui->progressBar2->setMaximum(100);
+    ui->progressBar2->setValue(100);
 
 }
 

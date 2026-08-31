@@ -164,7 +164,7 @@
         <item>
          <widget class="QLineEdit" name="lineEdit_formatHlavicky">
           <property name="text">
-           <string>turnus;line;evc;np;lat;lng;akt;takt;konc;tjr;pkt;tm;events;imei;type;conn;rych;smer;ridi;delta;ppevent;ppstatus;pperror</string>
+           <string>evc;line;turnus;np;tjr;pkt;lng;konc;takt;lat;akt;tm;events</string>
           </property>
          </widget>
         </item>

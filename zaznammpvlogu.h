@@ -1,14 +1,14 @@
 #ifndef ZAZNAMMPVLOGU_H
 #define ZAZNAMMPVLOGU_H
 #include <QObject>
-#include <QMap>
+#include <QHash>
 
 class ZaznamMpvLogu
 {
 public:
     ZaznamMpvLogu();
 
-    QMap<QString, QString>  obsah;
+    QHash<QString, QString>  obsah;
     QVector<QString> toQVectorQString(QVector<QString> &hlavicka);
 
     QString vypis();
