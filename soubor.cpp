@@ -353,26 +353,28 @@ QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloR
     }
 
 
+    logHledejHlavickyVElementu(koren,"V",seznamSloupecku);
+    logHledejHlavickyVElementu(koren,"APC",seznamSloupecku);
+    logHledejHlavickyVElementu(koren,"vlak",seznamSloupecku);
+    logHledejHlavickyVElementu(koren,"position",seznamSloupecku);
 
-    ///// inner
-    QDomNodeList elementy=koren.elementsByTagName("V");
-    if(elementy.isEmpty())
-    {
-        elementy=koren.elementsByTagName("vlak");
-    }
-    if(elementy.isEmpty())
-    {
-        if(koren.nodeName()=="position")
-        {
-            elementy=soubor.elementsByTagName("position");
-        }
-    }
+    ////////
+
+    return seznamSloupecku;
+}
+
+
+void Soubor::logHledejHlavickyVElementu(QDomElement koren, QString tagName, QVector<QString> &seznamSloupecku )
+{
+
+
+    QDomNodeList elementy=koren.elementsByTagName(tagName);
 
     int pocetElementu=elementy.count();
     if (pocetElementu==0)
     {
-        qDebug()<<"elementy nejsou na radku:"<<QString::number(cisloRadku);
-        return seznamSloupecku;
+        //qDebug()<<"elementy nejsou na radku:"<<QString::number(cisloRadku);
+        return;
     }
     else
     {
@@ -397,10 +399,11 @@ QVector<QString> Soubor::logZpracujRadekHledejHlavicky(QString radek, int cisloR
 
         }
     }
-    ////////
 
-    return seznamSloupecku;
 }
+
+
+
 
 int Soubor::slotSouborNaRadky2(QString fileName)
 {

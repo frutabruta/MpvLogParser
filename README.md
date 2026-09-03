@@ -1,6 +1,10 @@
 # MpvLogParser
 Utility to convert non-standard XML logs (*.log) from MPVnet dispaching system to CSV and .SQLITE databases.
 ## Changelog
+- 20260903
+  - Soubor
+    - fixed header finding for APC type messages
+   
 - 20260831_1513
   - import speed improvements
   - added element name to support APC messages

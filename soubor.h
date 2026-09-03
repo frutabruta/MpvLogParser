@@ -51,6 +51,7 @@ public:
     ZaznamMpvLogu attributesToZaznamMpvLogu(const QXmlStreamAttributes &vstup);
     QVector<ZaznamMpvLogu> logZpracujRadekStream(QString radek, int cisloRadku);
     QString prevedCas(const QString &s);
+
 private:
 
     //instance knihoven
@@ -71,6 +72,9 @@ private:
 
     ZaznamMpvLogu qDomElementToZaznamMpvLogu(QDomElement vstup);
     QString vektorStringuOddelovac(QVector<QString> vstup, QString oddelovac);
+
+    void logHledejHlavickyVElementu(QDomElement koren, QString tagName, QVector<QString> &seznamSloupecku);
+
 
 public slots:
     int slotSouborNaRadky2(QString fileName);
